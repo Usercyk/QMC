@@ -1,0 +1,11 @@
+[project]
+name = "qmc"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "autopep8>=2.3.2",
+    "pyqmc>=0.8.0",
+    "pyscf[naive-hci]>=2.10.0",
+]
