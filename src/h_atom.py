@@ -3,7 +3,7 @@
 @File        :   h_atom.py
 @Time        :   2025/10/13 14:16:51
 @Author      :   Usercyk
-@Description :   Hartree Fock of H atom.
+@Description :   Hartree Fock, VMC and DMC of H atom.
 """
 import os
 from functools import lru_cache
