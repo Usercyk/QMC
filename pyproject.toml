@@ -1,11 +1,14 @@
 [project]
 name = "qmc"
 version = "0.1.0"
-description = "Add your description here"
+description = "Quantum Monte Carlo Algorithm"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "autopep8>=2.3.2",
+    "matplotlib>=3.10.7",
     "pyqmc>=0.8.0",
     "pyscf[naive-hci]>=2.10.0",
+    "rich>=14.2.0",
+    "tqdm>=4.67.1",
 ]
