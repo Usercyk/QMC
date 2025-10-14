@@ -5,11 +5,13 @@
 @Author      :   Usercyk
 @Description :   Hartree Fock of H atom.
 """
-from functools import lru_cache
 import os
+from functools import lru_cache
+
 import pandas as pd
-from pyscf import gto, scf
 import pyqmc.api as pyq
+
+from pyscf import gto, scf
 from pyqmc.method.dmc import rundmc
 
 HARTREE_TO_EV = 27.211386245988
@@ -82,7 +84,8 @@ def run_vmc():
 
     e_mean_ev = e_mean_ha * HARTREE_TO_EV
     e_err_ev = e_err_ha * HARTREE_TO_EV  # type: ignore
-    print(f"VMC energy = {e_mean_ha:.6f} ± {e_err_ha:.6f} Ha = {e_mean_ev:.6f} ± {e_err_ev:.6f} eV")
+    print(
+        f"VMC energy = {e_mean_ha:.6f} ± {e_err_ha:.6f} Ha = {e_mean_ev:.6f} ± {e_err_ev:.6f} eV")
 
 
 def run_dmc():
@@ -111,7 +114,8 @@ def run_dmc():
 
     e_mean_ev = e_mean_ha * HARTREE_TO_EV
     e_err_ev = e_err_ha * HARTREE_TO_EV  # type: ignore
-    print(f"DMC energy = {e_mean_ha:.6f} ± {e_err_ha:.6f} Ha = {e_mean_ev:.6f} ± {e_err_ev:.6f} eV")
+    print(
+        f"DMC energy = {e_mean_ha:.6f} ± {e_err_ha:.6f} Ha = {e_mean_ev:.6f} ± {e_err_ev:.6f} eV")
 
 
 if __name__ == "__main__":
