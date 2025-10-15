@@ -1,9 +1,9 @@
 # coding: utf-8
 """
-@File        :   h_atom.py
+@File        :   main.py
 @Time        :   2025/10/13 14:16:51
 @Author      :   Usercyk
-@Description :   Hartree Fock, VMC and DMC of H atom.
+@Description :   Hartree Fock, VMC and DMC.
 """
 import os
 from functools import lru_cache
@@ -12,13 +12,15 @@ import pandas as pd
 import pyqmc.api as pyq
 
 from pyscf import gto, scf
+from pyscf.gto.mole import Mole
 from pyqmc.method.dmc import rundmc
+
 
 HARTREE_TO_EV = 27.211386245988
 
 
 @lru_cache
-def run_mean_field():
+def run_mean_field(mole: Mole):
     """
     Run mean field.
     """
@@ -28,25 +30,19 @@ def run_mean_field():
     # 拼接保存路径
     save_path = os.path.join("data", f"{basename}.mf.hdf5")
 
-    mole = gto.M(
-        atom="H 0. 0. 0.",
-        basis="cc-pvtz",
-        unit="Bohr",
-        spin=1
-    )
-
-    mean_field = scf.UHF(mole)
+    # mean_field = scf.UHF(mole)
+    mean_field = scf.RHF(mole)
     mean_field.chkfile = save_path
     mean_field.kernel()
     mean_field.dump_chk(mean_field.chkfile)
     return save_path
 
 
-def slater_jastrow():
+def slater_jastrow(mole: Mole, jastrow_kws: dict):
     """
     To slater jastrow
     """
-    chkfile = run_mean_field()
+    chkfile = run_mean_field(mole)
 
     mol, mf = pyq.recover_pyscf(chkfile)  # type: ignore pylint: disable=W0632
 
@@ -55,15 +51,15 @@ def slater_jastrow():
                                  slater_kws={"optimize_orbitals": True,
                                              "optimize_zeros": False,
                                              "optimize_determinants": False},
-                                 jastrow_kws={"na": 0})
+                                 jastrow_kws=jastrow_kws)
     return mol, wf, to_opt
 
 
-def run_vmc():
+def run_vmc(mole: Mole, jastrow_kws: dict):
     """
     Run VMC
     """
-    mol, wf, _ = slater_jastrow()
+    mol, wf, _ = slater_jastrow(mole, jastrow_kws)
 
     nconf = 500
     nsteps = 300
@@ -88,11 +84,11 @@ def run_vmc():
         f"VMC energy = {e_mean_ha:.6f} ± {e_err_ha:.6f} Ha = {e_mean_ev:.6f} ± {e_err_ev:.6f} eV")
 
 
-def run_dmc():
+def run_dmc(mole: Mole, jastrow_kws: dict):
     """
     Run DMC
     """
-    mol, wf, _ = slater_jastrow()
+    mol, wf, _ = slater_jastrow(mole, jastrow_kws)
 
     nconf = 1000
     nsteps = 300
@@ -119,5 +115,16 @@ def run_dmc():
 
 
 if __name__ == "__main__":
-    run_vmc()
-    run_dmc()
+    # h_atom = gto.M(
+    #     atom="H 0. 0. 0.",
+    #     basis="cc-pvtz",
+    #     unit="Bohr",
+    #     spin=1
+    # )
+    # h_atom_jastrow = {"na": 0}
+    h_mole = gto.M(atom="H 0. 0. 0.; H 0. 0. 1.4", ecp="ccecp",
+                   basis="ccecp-ccpvtz", unit="bohr")
+    h_mole_jastrow = {"na": 2}
+
+    run_vmc(h_mole, h_mole_jastrow)
+    run_dmc(h_mole, h_mole_jastrow)
